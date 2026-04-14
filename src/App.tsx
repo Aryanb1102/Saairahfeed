@@ -7,24 +7,11 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="topNav">
-        <button
-          type="button"
-          className={`tabBtn ${tab === "quiz" ? "tabBtnActive" : ""}`}
-          onClick={() => setTab("quiz")}
-        >
-          Quiz
-        </button>
-        <button
-          type="button"
-          className={`tabBtn ${tab === "crossword" ? "tabBtnActive" : ""}`}
-          onClick={() => setTab("crossword")}
-        >
-          Crossword
-        </button>
-      </header>
-
-      {tab === "quiz" ? <QuizPage /> : <CrosswordPage />}
+      {tab === "quiz" ? (
+        <QuizPage onGoToCrossword={() => setTab("crossword")} />
+      ) : (
+        <CrosswordPage onGoToQuiz={() => setTab("quiz")} />
+      )}
     </div>
   );
 }

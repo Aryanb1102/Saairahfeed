@@ -23,6 +23,7 @@ export type PersonalityQuizResult = {
 export type PersonalityQuizAnswerOption = {
   id: string;
   text: string;
+  image?: string;
   scores: ScoreMap;
 };
 
@@ -41,4 +42,3 @@ export type PersonalityQuiz = {
 };
 
 export type QuizSelectionsByQuestionId = Record<string, string | undefined>;
-

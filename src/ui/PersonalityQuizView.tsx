@@ -1,20 +1,27 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { PersonalityQuiz, QuizSelectionsByQuestionId } from "../quiz/types";
 import { scorePersonalityQuiz } from "../quiz/scorePersonalityQuiz";
+import "./buzzfeedQuiz.css";
 
 type Props = {
   quiz: PersonalityQuiz;
+  onGoToCrossword?: () => void;
 };
 
-export default function PersonalityQuizView({ quiz }: Props) {
-  const [stepIndex, setStepIndex] = useState(0);
+const isShortLabel = (text: string) => {
+  const trimmed = text.trim();
+  const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
+  return trimmed.length <= 44 && wordCount <= 7;
+};
+
+export default function PersonalityQuizView({ quiz, onGoToCrossword }: Props) {
   const [view, setView] = useState<"quiz" | "result">("quiz");
   const [selectionsByQuestionId, setSelectionsByQuestionId] = useState<QuizSelectionsByQuestionId>({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  const questionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const questionCount = quiz.questions.length;
-  const currentQuestion = quiz.questions[stepIndex];
-
-  const currentSelection = currentQuestion ? selectionsByQuestionId[currentQuestion.id] : undefined;
 
   const result = useMemo(() => {
     if (view !== "result") return null;
@@ -31,129 +38,240 @@ export default function PersonalityQuizView({ quiz }: Props) {
     return count;
   }, [quiz.questions, selectionsByQuestionId]);
 
-  const onPick = (optionId: string) => {
-    if (!currentQuestion) return;
+  const onRestart = () => {
+    setSelectionsByQuestionId({});
+    setView("quiz");
+    setSubmitAttempted(false);
+    const first = quiz.questions[0];
+    if (first) questionRefs.current[first.id]?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+  };
 
-    setSelectionsByQuestionId((prev) => ({ ...prev, [currentQuestion.id]: optionId }));
+  const firstUnansweredIndex = useMemo(() => {
+    for (let i = 0; i < quiz.questions.length; i += 1) {
+      const question = quiz.questions[i]!;
+      if (!selectionsByQuestionId[question.id]) return i;
+    }
+    return -1;
+  }, [quiz.questions, selectionsByQuestionId]);
 
-    if (stepIndex < questionCount - 1) {
-      setStepIndex((i) => i + 1);
-    } else {
-      setView("result");
+  const isComplete = answeredCount === questionCount;
+  const progressPct = questionCount === 0 ? 0 : Math.round((answeredCount / questionCount) * 100);
+
+  const onPick = (questionId: string, optionId: string) => {
+    setSelectionsByQuestionId((prev) => ({ ...prev, [questionId]: optionId }));
+    setSubmitAttempted(false);
+
+    const currentIndex = quiz.questions.findIndex((q) => q.id === questionId);
+    const next = quiz.questions[currentIndex + 1];
+    if (next) {
+      // Auto-scroll (BuzzFeed feel): pick -> glide to next question
+      setTimeout(() => {
+        questionRefs.current[next.id]?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+      }, 0);
     }
   };
 
-  const onBack = () => {
-    setStepIndex((i) => Math.max(0, i - 1));
+  const onGetResults = () => {
+    setSubmitAttempted(true);
+    if (!isComplete) {
+      const idx = firstUnansweredIndex;
+      if (idx >= 0) {
+        const q = quiz.questions[idx]!;
+        questionRefs.current[q.id]?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+      }
+      return;
+    }
+    setView("result");
   };
-
-  const onNext = () => {
-    if (stepIndex < questionCount - 1) setStepIndex((i) => i + 1);
-    else setView("result");
-  };
-
-  const onRestart = () => {
-    setSelectionsByQuestionId({});
-    setStepIndex(0);
-    setView("quiz");
-  };
-
-  if (view === "result" && winner && result) {
-    const share = winner.shareText;
-    return (
-      <section className="card">
-        <h1 className="title">{quiz.title}</h1>
-        <p className="subtle">
-          You answered {answeredCount}/{questionCount}. Your Saairah mood is:
-        </p>
-
-        <div className="question" style={{ marginTop: 18 }}>
-          {winner.image ? (
-            <img
-              src={winner.image}
-              alt={winner.title}
-              style={{
-                width: "100%",
-                maxHeight: 280,
-                objectFit: "cover",
-                borderRadius: 16,
-                border: "1px solid rgba(244, 246, 255, 0.12)",
-                marginBottom: 14,
-              }}
-            />
-          ) : null}
-
-          <h2 className="resultName">{winner.title}</h2>
-          <p className="subtle" style={{ marginTop: 0 }}>
-            {winner.description}
-          </p>
-
-          <div className="shareLine" aria-label="Share text">
-            {share}
-          </div>
-
-          <div className="controls">
-            <button className="btn" type="button" onClick={onRestart}>
-              Restart
-            </button>
-            <button
-              className="btn btnPrimary"
-              type="button"
-              onClick={() => navigator.clipboard?.writeText?.(share)}
-              title="Copies share text to clipboard"
-            >
-              Copy share text
-            </button>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
-    <section className="card">
-      <h1 className="title">{quiz.title}</h1>
-      <p className="subtle">Pick what feels most like you. No wrong answers—only lore.</p>
-      <div className="pillRow">
-        <span className="pill">
-          Question {Math.min(stepIndex + 1, questionCount)}/{questionCount}
-        </span>
-        <span className="pill">Answered: {answeredCount}</span>
-        <span className="pill">Personality scoring</span>
-        <span className="pill">Deterministic tiebreaks</span>
-      </div>
-
-      {currentQuestion ? (
-        <div className="question">
-          <h2 className="questionTitle">{currentQuestion.prompt}</h2>
-          <div className="options" role="list">
-            {currentQuestion.options.map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                className="optionBtn"
-                onClick={() => onPick(opt.id)}
-                aria-pressed={currentSelection === opt.id}
-              >
-                {opt.text}
+    <div className="bfPage">
+      <header className="bfTopNav">
+        <div className="bfTopNavInner">
+          <a className="bfLogo" href="/" onClick={(e) => e.preventDefault()}>
+            Saairahfeed
+          </a>
+          <div className="bfNavTabs">
+            <button type="button" className="bfNavTab bfNavTabActive" disabled>
+              Quiz
+            </button>
+            {onGoToCrossword ? (
+              <button type="button" className="bfNavTab" onClick={onGoToCrossword}>
+                Crossword
               </button>
-            ))}
-          </div>
-
-          <div className="controls">
-            <button className="btn" type="button" onClick={onBack} disabled={stepIndex === 0}>
-              Back
-            </button>
-            <button className="btn" type="button" onClick={onRestart}>
-              Restart
-            </button>
-            <button className="btn btnPrimary" type="button" onClick={onNext} disabled={!currentSelection}>
-              {stepIndex < questionCount - 1 ? "Next" : "See results"}
-            </button>
+            ) : null}
           </div>
         </div>
-      ) : null}
-    </section>
+      </header>
+
+      <main className="bfMain">
+        <article className="bfQuizCard" aria-label="BuzzFeed-style quiz">
+          <header className="bfQuizHeader">
+            {view === "result" && winner ? (
+              <>
+                <h1 className="bfResultTitle">{winner.title}</h1>
+                <p className="bfResultDek">{winner.description}</p>
+                {winner.image ? (
+                  <div className="bfResultMedia">
+                    <img className="bfResultImg" src={winner.image} alt={winner.title} />
+                  </div>
+                ) : null}
+                <div className="bfShareLine" aria-label="Share text">
+                  {winner.shareText}
+                </div>
+                <div className="bfControls">
+                  <button className="bfBtn" type="button" onClick={onRestart}>
+                    Restart
+                  </button>
+                  <button
+                    className="bfBtn bfBtnPrimary"
+                    type="button"
+                    onClick={() => navigator.clipboard?.writeText?.(winner.shareText)}
+                    title="Copies share text to clipboard"
+                  >
+                    Copy share text
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 className="bfQuizTitle">{quiz.title}</h1>
+                <p className="bfQuizDek">Pick what feels most like you. No wrong answers—only lore.</p>
+
+                <div className="bfProgressWrap" aria-label="Quiz progress">
+                  <div className="bfProgressMeta">
+                    <span className="bfProgressText">
+                      Answered {answeredCount} of {questionCount}
+                    </span>
+                    <span className="bfProgressText bfMuted">Tiebreaks are deterministic</span>
+                  </div>
+                  <div
+                    className="bfProgressTrack"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={questionCount}
+                    aria-valuenow={answeredCount}
+                  >
+                    <div className="bfProgressFill" style={{ width: `${progressPct}%` }} />
+                  </div>
+                </div>
+
+                {submitAttempted && !isComplete ? (
+                  <div className="bfError" role="alert">
+                    Answer all questions before getting your results. (We need the full lore.)
+                  </div>
+                ) : null}
+              </>
+            )}
+          </header>
+
+          {view !== "result" ? (
+            <>
+              {quiz.questions.map((question, index) => {
+                const selection = selectionsByQuestionId[question.id];
+                const hasImage = question.options.some((opt) => Boolean(opt.image));
+                const isUnlocked = firstUnansweredIndex === -1 ? true : index <= firstUnansweredIndex;
+
+                return (
+                  <div
+                    key={question.id}
+                    className="bfQuestionBlock"
+                    ref={(el) => {
+                      questionRefs.current[question.id] = el;
+                    }}
+                    aria-label={`Question ${index + 1}`}
+                  >
+                    <h2 className="bfQuestionTitle">
+                      {index + 1}. {question.prompt}
+                    </h2>
+
+                    {hasImage ? (
+                      <div className="bfAnswerGrid" role="list" aria-disabled={!isUnlocked}>
+                        {question.options.map((opt) => {
+                          const isSelected = selection === opt.id;
+                          const shouldDim = Boolean(selection) && !isSelected;
+                          const selectedClass = isSelected
+                            ? index % 2 === 0
+                              ? "bfIsSelected"
+                              : "bfIsSelectedBlue"
+                            : "";
+
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              className={`bfAnswerCard ${selectedClass} ${shouldDim ? "bfDimmed" : ""}`}
+                              aria-pressed={isSelected}
+                              onClick={() => {
+                                if (!isUnlocked) return;
+                                onPick(question.id, opt.id);
+                              }}
+                            >
+                              <div className="bfAnswerMedia">
+                                {opt.image ? <img className="bfAnswerImg" src={opt.image} alt={opt.text} /> : null}
+                              </div>
+                              <div
+                                className={`bfAnswerLabel ${
+                                  isShortLabel(opt.text) ? "bfAnswerLabelBold" : "bfAnswerLabelNormal"
+                                }`}
+                              >
+                                {opt.text}
+                              </div>
+                              <div className="bfCheck" aria-hidden="true">
+                                ✓
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="bfAnswerList" role="list" aria-disabled={!isUnlocked}>
+                        {question.options.map((opt) => {
+                          const isSelected = selection === opt.id;
+                          const shouldDim = Boolean(selection) && !isSelected;
+                          const selectedClass = isSelected
+                            ? index % 2 === 0
+                              ? "bfIsSelected"
+                              : "bfIsSelectedBlue"
+                            : "";
+
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              className={`bfTextOption ${selectedClass} ${shouldDim ? "bfDimmed" : ""}`}
+                              aria-pressed={isSelected}
+                              onClick={() => {
+                                if (!isUnlocked) return;
+                                onPick(question.id, opt.id);
+                              }}
+                              style={{ fontWeight: isShortLabel(opt.text) ? 700 : 400 }}
+                            >
+                              {opt.text}
+                              <span className="bfCheckInline" aria-hidden="true">
+                                ✓
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              <div className="bfControls">
+                <button className="bfBtn" type="button" onClick={onRestart}>
+                  Restart
+                </button>
+                <button className="bfBtn bfBtnPrimary" type="button" onClick={onGetResults} disabled={!isComplete}>
+                  Get Results
+                </button>
+              </div>
+            </>
+          ) : null}
+        </article>
+      </main>
+    </div>
   );
 }
-

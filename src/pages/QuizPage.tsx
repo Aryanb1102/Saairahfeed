@@ -4,11 +4,10 @@ import PersonalityQuizView from "../ui/PersonalityQuizView";
 
 const quiz: PersonalityQuiz = saairahMoodQuiz;
 
-export default function QuizPage() {
-  return (
-    <main className="page">
-      <PersonalityQuizView quiz={quiz} />
-    </main>
-  );
-}
+type Props = {
+  onGoToCrossword: () => void;
+};
 
+export default function QuizPage({ onGoToCrossword }: Props) {
+  return <PersonalityQuizView quiz={quiz} onGoToCrossword={onGoToCrossword} />;
+}
