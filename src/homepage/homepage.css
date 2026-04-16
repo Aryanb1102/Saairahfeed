@@ -1,0 +1,700 @@
+/* =====================================================================
+   SAAIRAHFEED HOMEPAGE — BuzzFeed-style design system
+   =====================================================================
+   Scoped to .hp-* prefix so it won't conflict with existing quiz/crossword styles.
+   ===================================================================== */
+
+/* ─── Fonts ─── */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+
+/* ─── Root & Reset ─── */
+.hp-root {
+  min-height: 100vh;
+  background: #ffffff;
+  color: #111111;
+  font-family: "Inter", "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* =====================================================================
+   NAVIGATION BAR
+   ===================================================================== */
+.hp-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #EE3322;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+}
+
+.hp-nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Hamburger */
+.hp-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.hp-hamburger-bar {
+  display: block;
+  width: 22px;
+  height: 2.5px;
+  background: #ffffff;
+  border-radius: 2px;
+  transition: transform 250ms ease, opacity 250ms ease;
+}
+
+.hp-bar-open:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+.hp-bar-open:nth-child(2) {
+  opacity: 0;
+}
+.hp-bar-open:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+/* Logo */
+.hp-logo {
+  font-weight: 900;
+  font-size: 26px;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.hp-logo:hover {
+  opacity: 0.9;
+}
+
+/* Desktop nav links */
+.hp-desktop-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hp-desktop-link {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.hp-desktop-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.hp-desktop-link-active {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* CTA button */
+.hp-nav-cta {
+  background: #ffffff;
+  color: #EE3322;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 16px;
+  border-radius: 999px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.hp-nav-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile drawer */
+.hp-mobile-drawer {
+  display: none;
+  flex-direction: column;
+  background: #d62e1f;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px 20px 14px;
+}
+
+.hp-mobile-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hp-mobile-link:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .hp-hamburger {
+    display: flex;
+  }
+  .hp-desktop-links {
+    display: none;
+  }
+  .hp-nav-cta {
+    display: none;
+  }
+  .hp-mobile-drawer {
+    display: flex;
+  }
+}
+
+/* =====================================================================
+   MAIN CONTENT AREA
+   ===================================================================== */
+.hp-main {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* =====================================================================
+   HERO GRID ("BENTO BOX")
+   ===================================================================== */
+.hp-hero-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 4px;
+  padding: 4px;
+}
+
+@media (max-width: 768px) {
+  .hp-hero-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Main hero card */
+.hp-hero-main {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 0;
+  min-height: 480px;
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.hp-hero-main:hover .hp-hero-headline {
+  text-decoration: underline;
+  text-decoration-color: #EE3322;
+  text-underline-offset: 4px;
+}
+
+@media (max-width: 768px) {
+  .hp-hero-main {
+    min-height: 340px;
+  }
+}
+
+.hp-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+.hp-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.82) 0%,
+    rgba(0, 0, 0, 0.35) 45%,
+    transparent 70%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 28px 24px;
+  gap: 6px;
+}
+
+.hp-hero-headline {
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: #ffffff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  transition: text-decoration-color 180ms ease;
+}
+
+.hp-hero-meta {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 2px;
+}
+
+/* Sub-hero column */
+.hp-hero-side {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 4px;
+}
+
+.hp-hero-sub {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  text-decoration: none;
+  color: #ffffff;
+  min-height: 238px;
+}
+
+.hp-hero-sub:hover .hp-hero-sub-headline {
+  text-decoration: underline;
+  text-decoration-color: #EE3322;
+  text-underline-offset: 3px;
+}
+
+.hp-hero-overlay-small {
+  padding: 18px 16px;
+}
+
+.hp-hero-sub-headline {
+  font-size: clamp(16px, 2vw, 22px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: #ffffff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* =====================================================================
+   TRENDING TICKER
+   ===================================================================== */
+.hp-ticker {
+  display: flex;
+  align-items: center;
+  background: #111111;
+  height: 38px;
+  overflow: hidden;
+}
+
+.hp-ticker-label {
+  background: #EE3322;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  padding: 0 14px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hp-ticker-track {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.hp-ticker-scroll {
+  display: inline-block;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-weight: 600;
+  animation: hp-ticker-scroll 45s linear infinite;
+}
+
+@keyframes hp-ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+/* =====================================================================
+   CONTENT GRID (feed + sidebar)
+   ===================================================================== */
+.hp-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 28px;
+  padding: 28px 20px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .hp-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =====================================================================
+   FEED ARTICLES
+   ===================================================================== */
+.hp-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.hp-feed-card {
+  border-bottom: 1px solid #e2e2e2;
+  padding: 20px 0;
+}
+
+.hp-feed-card:first-child {
+  padding-top: 0;
+}
+
+.hp-feed-link {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 18px;
+  text-decoration: none;
+  color: #111111;
+  align-items: start;
+}
+
+@media (max-width: 600px) {
+  .hp-feed-link {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hp-feed-img-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  aspect-ratio: 16 / 10;
+}
+
+.hp-feed-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 350ms ease;
+}
+
+.hp-feed-link:hover .hp-feed-img {
+  transform: scale(1.04);
+}
+
+.hp-feed-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.hp-feed-title {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: #111111;
+  transition: color 180ms ease;
+}
+
+.hp-feed-link:hover .hp-feed-title {
+  color: #EE3322;
+  text-decoration: underline;
+  text-decoration-color: #EE3322;
+  text-underline-offset: 3px;
+}
+
+.hp-feed-meta {
+  font-size: 12px;
+  font-weight: 500;
+  color: #767676;
+}
+
+/* =====================================================================
+   QUIZ BANNER
+   ===================================================================== */
+.hp-quiz-banner {
+  position: relative;
+  background:
+    radial-gradient(ellipse at 20% 60%, rgba(255, 215, 0, 0.45) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 30%, rgba(0, 230, 118, 0.35) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 90%, rgba(0, 163, 242, 0.3) 0%, transparent 50%),
+    linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border-radius: 12px;
+  padding: 44px 32px;
+  margin: 28px 0;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.hp-quiz-banner-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.hp-quiz-banner-title {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  margin: 0 0 10px;
+}
+
+.hp-quiz-banner-dek {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 22px;
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+.hp-quiz-banner-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hp-quiz-banner-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  transition: transform 150ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.hp-quiz-banner-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.hp-quiz-banner-btn-primary {
+  background: #EE3322;
+  border-color: #EE3322;
+  color: #ffffff;
+}
+
+.hp-quiz-banner-btn-primary:hover {
+  background: #d62e1f;
+  border-color: #d62e1f;
+}
+
+/* Decorative polka-dots */
+.hp-quiz-dots {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.06) 2px,
+    transparent 2px
+  );
+  background-size: 16px 16px;
+  pointer-events: none;
+}
+
+.hp-quiz-dots-tl {
+  top: -40px;
+  left: -40px;
+}
+
+.hp-quiz-dots-br {
+  bottom: -40px;
+  right: -40px;
+}
+
+/* Floating stickers */
+.hp-quiz-float-sticker {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.hp-quiz-float-1 {
+  top: 14px;
+  right: 80px;
+}
+
+.hp-quiz-float-2 {
+  bottom: 14px;
+  left: 50px;
+}
+
+@media (max-width: 600px) {
+  .hp-quiz-float-sticker {
+    display: none;
+  }
+  .hp-quiz-banner {
+    padding: 32px 20px;
+  }
+}
+
+/* =====================================================================
+   TRENDING SIDEBAR
+   ===================================================================== */
+.hp-trending {
+  position: sticky;
+  top: 72px;
+  background: #f8f8f8;
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+@media (max-width: 960px) {
+  .hp-trending {
+    position: static;
+  }
+}
+
+.hp-trending-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.hp-trending-title {
+  font-size: 16px;
+  font-weight: 800;
+  margin: 0;
+  color: #111111;
+}
+
+.hp-trending-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hp-trending-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.hp-trending-item:last-child {
+  border-bottom: none;
+}
+
+.hp-trending-num {
+  font-size: 22px;
+  font-weight: 900;
+  color: #EE3322;
+  min-width: 28px;
+  line-height: 1;
+}
+
+.hp-trending-link {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111111;
+  text-decoration: none;
+  line-height: 1.3;
+  transition: color 150ms ease;
+}
+
+.hp-trending-link:hover {
+  color: #EE3322;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* =====================================================================
+   FOOTER
+   ===================================================================== */
+.hp-footer {
+  border-top: 4px solid #EE3322;
+  background: #111111;
+  margin-top: 40px;
+}
+
+.hp-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hp-footer-logo {
+  font-weight: 900;
+  font-size: 22px;
+  color: #EE3322;
+  letter-spacing: -0.02em;
+}
+
+.hp-footer-copy {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* =====================================================================
+   UTILITY: Tag pill override for light backgrounds
+   ===================================================================== */
+.hp-tag-pill {
+  /* inherits inline styles from TagPill component */
+}
+
+/* =====================================================================
+   SCROLLBAR STYLING
+   ===================================================================== */
+.hp-root::-webkit-scrollbar {
+  width: 8px;
+}
+
+.hp-root::-webkit-scrollbar-track {
+  background: #f4f4f4;
+}
+
+.hp-root::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.hp-root::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}

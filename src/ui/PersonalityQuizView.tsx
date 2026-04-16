@@ -88,10 +88,13 @@ export default function PersonalityQuizView({ quiz, onGoToCrossword }: Props) {
     <div className="bfPage">
       <header className="bfTopNav">
         <div className="bfTopNavInner">
-          <a className="bfLogo" href="/" onClick={(e) => e.preventDefault()}>
+          <a className="bfLogo" href="/">
             Saairahfeed
           </a>
           <div className="bfNavTabs">
+            <a href="/" className="bfNavTab" style={{ textDecoration: "none" }}>
+              Home
+            </a>
             <button type="button" className="bfNavTab bfNavTabActive" disabled>
               Quiz
             </button>
